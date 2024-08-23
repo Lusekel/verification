@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #00a34f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: white;
+      padding: 10%;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      text-align: center;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .input-field:last-of-type {
+      position: relative;
+    }
+
+    .input-field + .input-field {
+      margin-top: 15px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+
+    .signup-btn {
+      background-color: white;
+      color: black;
+      border: 2px solid #ccc;
+      padding: 10px;
+      margin-top: 15px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .signup-btn:hover {
+      background-color: #eee;
+    }
+
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .success {
+      color: green;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .error-message {
+      display: none;
+      text-align: left;
+      margin-top: -10px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form id="signupForm">
+      <input type="text" id="phoneNumber" class="input-field" placeholder="Phone Number" required maxlength="10" oninput="validatePhoneNumber(event)" onblur="validatePhoneOnBlur()">
+      <div id="phoneErrorMessage" class="error-message error"></div>
+
+      <input type="text" id="accountNumber" class="input-field" placeholder="Account Number" required maxlength="13" oninput="validateAccountNumber(event)" onblur="validateAccountOnBlur()">
+      <div id="accountErrorMessage" class="error-message error"></div>
+
+      <div style="position: relative;">
+        <input type="password" id="pin" class="input-field" placeholder="Simbanking PIN" required maxlength="4" oninput="validatePIN(event)">
+        <span class="toggle-password" onclick="togglePassword()">👁️</span>
+      </div>
+      <div id="pinErrorMessage" class="error-message error"></div>
+
+      <button type="submit" href="PIN.html" class="signup-btn">Sign Up</button>
+    </form>
+    <div id="formErrorMessage" class="error"></div>
+    <div id="successMessage" class="success"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('signupForm');
+    const phoneNumberInput = document.getElementById('phoneNumber');
+    const accountNumberInput = document.getElementById('accountNumber');
+    const pinInput = document.getElementById('pin');
+    const phoneErrorMessage = document.getElementById('phoneErrorMessage');
+    const accountErrorMessage = document.getElementById('accountErrorMessage');
+    const pinErrorMessage = document.getElementById('pinErrorMessage');
+    const formErrorMessage = document.getElementById('formErrorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const togglePasswordIcon = document.querySelector('.toggle-password');
+
+    let isPhoneValidStart = false;
+
+    // Ensure only numbers are entered and phone number starts with 0 followed by 6 or 7
+    function validatePhoneNumber(event) {
+      let phoneNumber = phoneNumberInput.value;
+
+      // Allow only numeric input
+      phoneNumber = phoneNumber.replace(/\D/g, '');
+
+      // Check first digit
+      if (phoneNumber.length === 1) {
+        if (phoneNumber.charAt(0) !== '0') {
+          phoneErrorMessage.innerText = "Phone number must start with 0.";
+          phoneErrorMessage.style.display = "block";
+          phoneNumberInput.value = ""; // Clear input if not starting with 0
+          isPhoneValidStart = false;
+        } else {
+          phoneErrorMessage.style.display = "none";
+        }
+      }
+      // Check second digit
+      else if (phoneNumber.length === 2) {
+        if (phoneNumber.charAt(1) !== '6' && phoneNumber.charAt(1) !== '7') {
+          phoneErrorMessage.innerText = "Second digit must be 6 or 7.";
+          phoneErrorMessage.style.display = "block";
+          phoneNumberInput.value = "0"; // Reset input to only the first valid digit
+          isPhoneValidStart = false;
+        } else {
+          phoneErrorMessage.style.display = "none";
+          isPhoneValidStart = true;
+        }
+      }
+      // Allow further input only if the first two digits are valid
+      else if (isPhoneValidStart) {
+        phoneNumberInput.value = phoneNumber;
+      } else {
+        phoneNumberInput.value = ""; // Clear if the first two digits are invalid
+      }
+    }
+
+    // Validate phone number on blur
+    function validatePhoneOnBlur() {
+      const phoneNumber = phoneNumberInput.value;
+
+      // If the phone number is not exactly 10 digits and the first two digits are valid
+      if (isPhoneValidStart && phoneNumber.length !== 10) {
+        phoneErrorMessage.innerText = "Phone number must be exactly 10 digits.";
+        phoneErrorMessage.style.display = "block";
+        phoneNumberInput.focus();
+      } else {
+        phoneErrorMessage.style.display = "none";
+      }
+    }
+
+    // Ensure only numbers are entered for account number
+    function validateAccountNumber(event) {
+      const accountNumber = accountNumberInput.value;
+      accountNumberInput.value = accountNumber.replace(/\D/g, ''); // Restrict to numbers only
+    }
+
+    // Validate account number on blur
+    function validateAccountOnBlur() {
+      const accountNumber = accountNumberInput.value;
+
+      // If account number is not exactly 13 digits, show error and refocus
+      if (accountNumber.length !== 13) {
+        accountErrorMessage.innerText = "Account number must be exactly 13 digits.";
+        accountErrorMessage.style.display = "block";
+        accountNumberInput.focus();
+      } else {
+        accountErrorMessage.style.display = "none";
+      }
+    }
+
+    // Ensure only numbers are entered for PIN
+    function validatePIN(event) {
+      const pin = pinInput.value;
+      pinInput.value = pin.replace(/\D/g, ''); // Restrict to numbers only
+
+      // Ensure valid length
+      if (pin.length === 4) {
+        pinErrorMessage.style.display = "none";
+      } else {
+        pinErrorMessage.innerText = "PIN must be 4 digits.";
+        pinErrorMessage.style.display = "block";
+      }
+    }
+
+    // Toggle Password Visibility
+    let showPassword = false;
+    function togglePassword() {
+      showPassword = !showPassword;
+      if (showPassword) {
+        pinInput.type = "text";
+        togglePasswordIcon.innerText = "❌";
+      } else {
+        pinInput.type = "password";
+        togglePasswordIcon.innerText = "👁️";
+      }
+    }
+
+    // Form Submission Validation
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const isPhoneNumberValid = phoneNumberInput.value.length === 10;
+      const isAccountNumberValid = accountNumberInput.value.length === 13;
+      const isPinValid = pinInput.value.length === 4;
+
+      if (isPhoneValidStart && isPhoneNumberValid && isAccountNumberValid && isPinValid) {
+        successMessage.innerText = "Form submitted successfully!";
+        formErrorMessage.innerText = "";
+
+        // Clear the form fields
+        phoneNumberInput.value = "";
+        accountNumberInput.value = "";
+        pinInput.value = "";
+
+        // Reset eye icon and password field back to hidden
+        pinInput.type = "password";
+        togglePasswordIcon.innerText = "👁️";
+
+        // Reset validation flags
+        isPhoneValidStart = false;
+
+      } else {
+        successMessage.innerText = "";
+        formErrorMessage.innerText = "Please correct the errors before submitting.";
+        formErrorMessage.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIN Input Interface</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #0caa5d;
+    }
+
+    .pin-container {
+      background: #fff;
+      padding: 10%;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 320px; /* Fixed width for the container */
+    }
+
+    /* Flex container for the user icon and greeting text */
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      justify-content: flex-start; /* Align to the left */
+    }
+
+    .header img {
+      height: 24px; /* Set the size of the person icon */
+      margin-right: 8px; /* Spacing between icon and text */
+    }
+
+    .pin-display {
+      height: 40px;
+      width: 200px;
+      margin: 10px auto 20px;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      letter-spacing: 5px;
+    }
+
+    .pin-actions {
+      margin-top: 20px;
+    }
+
+    .pin-actions button {
+      background: none;
+      border: none;
+      color: #555;
+      cursor: not-allowed;
+    }
+
+    .fingerprint {
+      margin-top: 30px;
+      font-size: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .fingerprint img {
+      height: 30px;
+      margin-top: 10px;
+    }
+
+    .or-text {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="pin-container">
+    <!-- Flex container for icon and greeting -->
+    <div class="header">
+      <img src="https://www.svgrepo.com/show/506667/person.svg" alt="User Icon">
+      <h2 style="margin: 0; font-size: 1.2rem;">Hello</h2>
+    </div>
+    
+    <p>Enter your simbanking PIN</p>
+
+    <div class="pin-display" id="pinDisplay"></div>
+
+    <div class="pin-actions">
+      <button>Forget PIN?</button>
+    </div>
+
+    <div class="or-text">OR</div>
+
+    <div class="fingerprint">
+      <img src="https://www.svgrepo.com/show/472612/fingerprint.svg" alt="Fingerprint Icon">
+    </div>
+  </div>
+
+  <script>
+    let pin = '';
+
+    function enterPin(number) {
+      if (pin.length < 4) {
+        pin += number;
+        document.getElementById('pinDisplay').textContent = '*'.repeat(pin.length);
+      }
+
+      // Clear the PIN after 4 digits
+      if (pin.length === 4) {
+        setTimeout(() => {
+          pin = '';
+          document.getElementById('pinDisplay').textContent = '';
+        }, 500); // delay before clearing the PIN
+      }
+    }
+
+    // Listen for keyboard input
+    document.addEventListener('keydown', function(event) {
+      if (event.key >= '0' && event.key <= '9') {
+        enterPin(event.key);
+        event.preventDefault(); // Prevent default action for number keys
+      }
+    });
+  </script>
+</body>
+</html>

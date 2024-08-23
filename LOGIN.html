@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #089f63;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: white;
+      padding: 10%;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      text-align: center;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 25px;
+      font-size: 16px;
+    }
+
+    .input-field + .input-field {
+      margin-top: 15px;
+    }
+
+    .login-btn {
+      background-color: #ececec;
+      color: black;
+      border: 2px solid #ccc;
+      padding: 10px;
+      margin-top: 15px;
+      font-size: 18px;
+      border-radius: 25px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .login-btn:hover {
+      background-color: #ddd;
+    }
+
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .error-message {
+      display: none;
+      text-align: left;
+      margin-top: -10px;
+      margin-bottom: 10px;
+    }
+
+    .register-link {
+      font-size: 12px;
+      margin-top: 15px;
+    }
+
+    .register-link a {
+      text-decoration: none;
+      color: #666;
+      font-weight: bold;
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form id="loginForm">
+      <!-- Phone number input first -->
+      <input type="text" id="phoneNumber" class="input-field" placeholder="Enter Phone Number" required maxlength="10" oninput="validatePhoneNumber(event)" onblur="validatePhoneOnBlur()">
+      <div id="phoneErrorMessage" class="error-message error"></div>
+
+      <!-- Account number input second -->
+      <input type="text" id="accountNumber" class="input-field" placeholder="Enter Account Number" required maxlength="13" oninput="validateAccountNumber(event)" onblur="validateAccountOnBlur()">
+      <div id="accountErrorMessage" class="error-message error"></div>
+
+      <button type="submit" class="login-btn">Log In</button>
+      <div class="register-link">
+        <p>Not registered? <a href="#">Sign Up</a></p>
+      </div>
+    </form>
+    <div id="formErrorMessage" class="error"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const phoneNumberInput = document.getElementById('phoneNumber');
+    const accountNumberInput = document.getElementById('accountNumber');
+    const phoneErrorMessage = document.getElementById('phoneErrorMessage');
+    const accountErrorMessage = document.getElementById('accountErrorMessage');
+    const formErrorMessage = document.getElementById('formErrorMessage');
+
+    let isPhoneValidStart = false;
+
+    // Ensure only numbers are entered and phone number starts with 0 followed by 6 or 7
+    function validatePhoneNumber(event) {
+      let phoneNumber = phoneNumberInput.value;
+
+      // Allow only numeric input
+      phoneNumber = phoneNumber.replace(/\D/g, '');
+
+      // Check first digit
+      if (phoneNumber.length === 1) {
+        if (phoneNumber.charAt(0) !== '0') {
+          phoneErrorMessage.innerText = "Phone number must start with 0.";
+          phoneErrorMessage.style.display = "block";
+          phoneNumberInput.value = ""; // Clear input if not starting with 0
+          isPhoneValidStart = false;
+        } else {
+          phoneErrorMessage.style.display = "none";
+        }
+      }
+      // Check second digit
+      else if (phoneNumber.length === 2) {
+        if (phoneNumber.charAt(1) !== '6' && phoneNumber.charAt(1) !== '7') {
+          phoneErrorMessage.innerText = "Second digit must be 6 or 7.";
+          phoneErrorMessage.style.display = "block";
+          phoneNumberInput.value = "0"; // Reset input to only the first valid digit
+          isPhoneValidStart = false;
+        } else {
+          phoneErrorMessage.style.display = "none";
+          isPhoneValidStart = true;
+        }
+      }
+      // Allow further input only if the first two digits are valid
+      else if (isPhoneValidStart) {
+        phoneNumberInput.value = phoneNumber;
+
+        // Remove error message and blur the input when the phone number reaches 10 digits
+        if (phoneNumber.length === 10) {
+          phoneErrorMessage.style.display = "none";
+          phoneNumberInput.blur();  // Removes the focus (cursor) from the input
+        }
+      } else {
+        phoneNumberInput.value = ""; // Clear if the first two digits are invalid
+      }
+    }
+
+    // Validate phone number on blur
+    function validatePhoneOnBlur() {
+      const phoneNumber = phoneNumberInput.value;
+
+      // If the phone number is not exactly 10 digits and the first two digits are valid
+      if (isPhoneValidStart && phoneNumber.length !== 10) {
+        phoneErrorMessage.innerText = "Phone number must be exactly 10 digits.";
+        phoneErrorMessage.style.display = "block";
+        phoneNumberInput.focus();
+      } else {
+        phoneErrorMessage.style.display = "none";
+      }
+    }
+
+    // Ensure only numbers are entered for account number
+    function validateAccountNumber(event) {
+      const accountNumber = accountNumberInput.value;
+      accountNumberInput.value = accountNumber.replace(/\D/g, ''); // Restrict to numbers only
+
+      // Remove error message and blur the input when the account number reaches 13 digits
+      if (accountNumber.length === 13) {
+        accountErrorMessage.style.display = "none";
+        accountNumberInput.blur();  // Removes the focus (cursor) from the input
+      }
+    }
+
+    // Validate account number on blur
+    function validateAccountOnBlur() {
+      const accountNumber = accountNumberInput.value;
+
+      // If account number is not exactly 13 digits, show error and refocus
+      if (accountNumber.length !== 13) {
+        accountErrorMessage.innerText = "Account number must be exactly 13 digits.";
+        accountErrorMessage.style.display = "block";
+        accountNumberInput.focus();
+      } else {
+        accountErrorMessage.style.display = "none";
+      }
+    }
+
+    // Form Submission Validation
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const isPhoneNumberValid = phoneNumberInput.value.length === 10;
+      const isAccountNumberValid = accountNumberInput.value.length === 13;
+
+      if (isPhoneValidStart && isPhoneNumberValid && isAccountNumberValid) {
+        formErrorMessage.innerText = "";
+
+        // Clear the form fields
+        phoneNumberInput.value = "";
+        accountNumberInput.value = "";
+
+        // Success - Proceed with form submission or redirection
+        alert("Form submitted successfully!");
+      } else {
+        formErrorMessage.innerText = "Please correct the errors before submitting.";
+        formErrorMessage.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
