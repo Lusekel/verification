@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRDB Bank - About</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #007749;
+            padding: 5px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Ensure space between logo and nav */
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        header img {
+            height: 80px;
+            width: 80px;
+            margin-right: 10px;
+        }
+        nav {
+            display: flex;
+            flex-wrap: wrap; /* Allows wrapping on smaller screens */
+            justify-content: flex-end; /* Keeps nav aligned to the right */
+        }
+        nav a {
+            color: white;
+            padding: 8px 10px;
+            text-decoration: none;
+            font-weight: bold;
+            white-space: nowrap; /* Prevents text wrapping */
+        }
+        nav a:hover {
+            background-color: #00593f; /* Darker green for hover effect */
+        }
+        .content {
+            padding: 20px;
+            padding-top: 100px; /* Adjusted based on header height */
+            padding-bottom: 80px; /* Space for footer */
+            background-color: white;
+            min-height: calc(100vh - 120px); /* Adjusted to account for header and footer height */
+        }
+        .content h1 {
+            color: #007749;
+            margin-top: 0;
+        }
+        .footer {
+            background-color: #007749;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        /* Responsive styling for smaller screens */
+        @media (max-width: 768px) {
+            nav {
+                justify-content: center; /* Center the navigation on smaller screens */
+            }
+
+            header img {
+                height: 60px; /* Reduce the size of the logo on smaller screens */
+                width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://d1yjjnpx0p53s8.cloudfront.net/styles/logo-thumbnail/s3/072019/crdb_logo_3d-01_copy.png?L6F4A8DyAuhGIYRGm71lRBQxIxUz4wCi&itok=14hZGM7l" alt="CRDB Bank Logo">
+        <nav>
+            <a href="HOME.html">HOME</a>
+            <a href="ABOUT.html">ABOUT</a>
+            <a href="SIGNUP.html">SIGN UP</a>
+            <a href="LOGIN.html">LOG IN</a>
+            <a href="CONTACTUS.html">CONTACT US</a>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h1>About CRDB Bank and Cryptographic Technology</h1>
+        <p>Welcome to CRDB Bank's Digital Security Hub!</p>
+
+        <p>At CRDB Bank, we prioritize your security and privacy in the digital age. As financial transactions increasingly move online, the need for robust security measures becomes ever more critical. This is where Cryptographic Technology comes into play.</p>
+
+        <h2>Our Commitment to Security:</h2>
+        <p>CRDB Bank leverages advanced cryptographic technology to protect your sensitive information. This includes securing transactions, safeguarding customer data, and ensuring that all digital interactions are encrypted and safe from unauthorized access.</p>
+
+        <h2>What is Cryptography?</h2>
+        <p>Cryptography is the practice and study of techniques for securing communication and data from adversaries. In simple terms, it transforms your information into a code, ensuring that only authorized parties can access it.</p>
+
+        <h2>Why Choose Us?</h2>
+        <ul>
+            <li><strong>End-to-End Encryption:</strong> From the moment you initiate a transaction until it's completed, your data is encrypted to prevent interception.</li>
+            <li><strong>Multi-Factor Authentication:</strong> We employ multiple layers of security to verify your identity, ensuring that only you can access your accounts.</li>
+            <li><strong>Real-Time Fraud Detection:</strong> Our systems are designed to detect and respond to any suspicious activities in real-time, protecting your assets 24/7.</li>
+        </ul>
+
+        <h2>Our Mission:</h2>
+        <p>To provide our customers with the most secure and trustworthy banking experience, utilizing cutting-edge cryptographic methods to protect their financial information.</p>
+
+        <h2>Join Us on the Journey:</h2>
+        <p>As the digital landscape evolves, so do we. CRDB Bank is committed to continuously improving our cryptographic techniques, ensuring that we stay ahead of the curve in protecting your financial future.</p>
+    </div>
+
+    <div class="footer">
+        &copy; 2024 CRDB Bank PLC. All rights reserved.
+    </div>
+
+</body>
+</html>

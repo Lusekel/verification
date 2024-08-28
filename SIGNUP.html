@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #00a34f;
+      background-color: #007749;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -71,7 +71,7 @@
     }
 
     .success {
-      color: green;
+      color: #007749;
       font-size: 14px;
       margin-top: 10px;
     }
@@ -82,11 +82,44 @@
       margin-top: -10px;
       margin-bottom: 10px;
     }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      accent-color: #007749; /* Set the color of the checkbox */
+      margin-right: 10px;
+    }
+
+    .checkbox-label a {
+      color: #007749;
+      text-decoration: none;
+    }
+
+    .checkbox-label a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <form id="signupForm">
+      <input type="text" id="firstName" class="input-field" placeholder="First Name" required>
+      <div id="firstNameErrorMessage" class="error-message error"></div>
+
+      <input type="text" id="middleName" class="input-field" placeholder="Middle Name">
+      <div id="middleNameErrorMessage" class="error-message error"></div>
+
+      <input type="text" id="lastName" class="input-field" placeholder="Last Name" required>
+      <div id="lastNameErrorMessage" class="error-message error"></div>
+
+      <input type="email" id="email" class="input-field" placeholder="Email Address" required>
+      <div id="emailErrorMessage" class="error-message error"></div>
+
       <input type="text" id="phoneNumber" class="input-field" placeholder="Phone Number" required maxlength="10" oninput="validatePhoneNumber(event)" onblur="validatePhoneOnBlur()">
       <div id="phoneErrorMessage" class="error-message error"></div>
 
@@ -94,12 +127,19 @@
       <div id="accountErrorMessage" class="error-message error"></div>
 
       <div style="position: relative;">
-        <input type="password" id="pin" class="input-field" placeholder="Simbanking PIN" required maxlength="4" oninput="validatePIN(event)">
+        <input type="password" id="pin" class="input-field" placeholder="Simbanking PIN" required maxlength="4" oninput="validatePIN(event)" onblur="validatePINOnBlur()">
         <span class="toggle-password" onclick="togglePassword()">👁️</span>
       </div>
       <div id="pinErrorMessage" class="error-message error"></div>
 
-      <button type="submit" href="PIN.html" class="signup-btn">Sign Up</button>
+      <div class="checkbox-label">
+        <input type="checkbox" id="terms" required>
+        <label for="terms">
+          I agree to the <a href="https://crdbbank-co-tz.webpkgcache.com/doc/-/s/crdbbank.co.tz/storage/app/media/Forms%20and%20Guides/General-Terms-and-Condition.pdf" target="_blank">Terms and Conditions</a> and <a href="https://crdbbank.cd/storage/app/media/Forms%20and%20Guides/CRDB-BANK-PLC-WEBSITE-PRIVACY-POLICY.pdf" target="_blank">Privacy Policy</a>
+        </label>
+      </div>
+
+      <button type="submit" class="signup-btn">Sign Up</button>
     </form>
     <div id="formErrorMessage" class="error"></div>
     <div id="successMessage" class="success"></div>
@@ -110,58 +150,79 @@
     const phoneNumberInput = document.getElementById('phoneNumber');
     const accountNumberInput = document.getElementById('accountNumber');
     const pinInput = document.getElementById('pin');
+    const emailInput = document.getElementById('email');
+    const firstNameInput = document.getElementById('firstName');
+    const middleNameInput = document.getElementById('middleName');
+    const lastNameInput = document.getElementById('lastName');
     const phoneErrorMessage = document.getElementById('phoneErrorMessage');
     const accountErrorMessage = document.getElementById('accountErrorMessage');
     const pinErrorMessage = document.getElementById('pinErrorMessage');
+    const emailErrorMessage = document.getElementById('emailErrorMessage');
+    const firstNameErrorMessage = document.getElementById('firstNameErrorMessage');
+    const middleNameErrorMessage = document.getElementById('middleNameErrorMessage');
+    const lastNameErrorMessage = document.getElementById('lastNameErrorMessage');
     const formErrorMessage = document.getElementById('formErrorMessage');
     const successMessage = document.getElementById('successMessage');
     const togglePasswordIcon = document.querySelector('.toggle-password');
 
     let isPhoneValidStart = false;
+    let showPassword = false;
 
-    // Ensure only numbers are entered and phone number starts with 0 followed by 6 or 7
+    function capitalizeFirstLetter(input) {
+      let value = input.value.trim();
+      if (value.length > 0) {
+        input.value = value.charAt(0).toUpperCase() + value.slice(1);
+      }
+    }
+
+    function handleFieldFocus(event) {
+      const input = event.target;
+      if (input.id === 'firstName' || input.id === 'middleName' || input.id === 'lastName') {
+        capitalizeFirstLetter(input);
+      }
+      if (input.id === 'email') {
+        validateEmail(event);
+      }
+    }
+
     function validatePhoneNumber(event) {
       let phoneNumber = phoneNumberInput.value;
 
-      // Allow only numeric input
       phoneNumber = phoneNumber.replace(/\D/g, '');
 
-      // Check first digit
       if (phoneNumber.length === 1) {
         if (phoneNumber.charAt(0) !== '0') {
           phoneErrorMessage.innerText = "Phone number must start with 0.";
           phoneErrorMessage.style.display = "block";
-          phoneNumberInput.value = ""; // Clear input if not starting with 0
+          phoneNumberInput.value = "";
           isPhoneValidStart = false;
         } else {
           phoneErrorMessage.style.display = "none";
         }
-      }
-      // Check second digit
-      else if (phoneNumber.length === 2) {
+      } else if (phoneNumber.length === 2) {
         if (phoneNumber.charAt(1) !== '6' && phoneNumber.charAt(1) !== '7') {
           phoneErrorMessage.innerText = "Second digit must be 6 or 7.";
           phoneErrorMessage.style.display = "block";
-          phoneNumberInput.value = "0"; // Reset input to only the first valid digit
+          phoneNumberInput.value = "0";
           isPhoneValidStart = false;
         } else {
           phoneErrorMessage.style.display = "none";
           isPhoneValidStart = true;
         }
-      }
-      // Allow further input only if the first two digits are valid
-      else if (isPhoneValidStart) {
+      } else if (isPhoneValidStart) {
         phoneNumberInput.value = phoneNumber;
+
+        if (phoneNumber.length === 10) {
+          accountNumberInput.focus();
+        }
       } else {
-        phoneNumberInput.value = ""; // Clear if the first two digits are invalid
+        phoneNumberInput.value = "";
       }
     }
 
-    // Validate phone number on blur
     function validatePhoneOnBlur() {
       const phoneNumber = phoneNumberInput.value;
 
-      // If the phone number is not exactly 10 digits and the first two digits are valid
       if (isPhoneValidStart && phoneNumber.length !== 10) {
         phoneErrorMessage.innerText = "Phone number must be exactly 10 digits.";
         phoneErrorMessage.style.display = "block";
@@ -171,17 +232,21 @@
       }
     }
 
-    // Ensure only numbers are entered for account number
     function validateAccountNumber(event) {
-      const accountNumber = accountNumberInput.value;
-      accountNumberInput.value = accountNumber.replace(/\D/g, ''); // Restrict to numbers only
+      let accountNumber = accountNumberInput.value;
+
+      accountNumber = accountNumber.replace(/\D/g, '');
+
+      if (accountNumber.length === 13) {
+        pinInput.focus();
+      }
+
+      accountNumberInput.value = accountNumber;
     }
 
-    // Validate account number on blur
     function validateAccountOnBlur() {
       const accountNumber = accountNumberInput.value;
 
-      // If account number is not exactly 13 digits, show error and refocus
       if (accountNumber.length !== 13) {
         accountErrorMessage.innerText = "Account number must be exactly 13 digits.";
         accountErrorMessage.style.display = "block";
@@ -191,62 +256,64 @@
       }
     }
 
-    // Ensure only numbers are entered for PIN
     function validatePIN(event) {
-      const pin = pinInput.value;
-      pinInput.value = pin.replace(/\D/g, ''); // Restrict to numbers only
+      let pin = pinInput.value;
 
-      // Ensure valid length
+      pin = pin.replace(/\D/g, '');
+
+      pinInput.value = pin;
+
       if (pin.length === 4) {
-        pinErrorMessage.style.display = "none";
-      } else {
-        pinErrorMessage.innerText = "PIN must be 4 digits.";
-        pinErrorMessage.style.display = "block";
+        pinInput.focus();
       }
     }
 
-    // Toggle Password Visibility
-    let showPassword = false;
+    function validatePINOnBlur() {
+      const pin = pinInput.value;
+
+      if (pin.length !== 4) {
+        pinErrorMessage.innerText = "PIN must be exactly 4 digits.";
+        pinErrorMessage.style.display = "block";
+        pinInput.focus();
+      } else {
+        pinErrorMessage.style.display = "none";
+      }
+    }
+
+    function validateEmail(event) {
+      const email = emailInput.value;
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!regex.test(email) || !email.endsWith('@gmail.com')) {
+        emailErrorMessage.innerText = "Please enter a valid Gmail address.";
+        emailErrorMessage.style.display = "block";
+      } else {
+        emailErrorMessage.style.display = "none";
+      }
+    }
+
     function togglePassword() {
       showPassword = !showPassword;
-      if (showPassword) {
-        pinInput.type = "text";
-        togglePasswordIcon.innerText = "❌";
-      } else {
-        pinInput.type = "password";
-        togglePasswordIcon.innerText = "👁️";
-      }
+      pinInput.type = showPassword ? 'text' : 'password';
+      togglePasswordIcon.textContent = showPassword ? '❌' : '👁️';
     }
 
-    // Form Submission Validation
-    form.addEventListener('submit', function(event) {
+    form.addEventListener('submit', (event) => {
       event.preventDefault();
 
-      const isPhoneNumberValid = phoneNumberInput.value.length === 10;
-      const isAccountNumberValid = accountNumberInput.value.length === 13;
-      const isPinValid = pinInput.value.length === 4;
-
-      if (isPhoneValidStart && isPhoneNumberValid && isAccountNumberValid && isPinValid) {
-        successMessage.innerText = "Form submitted successfully!";
-        formErrorMessage.innerText = "";
-
-        // Clear the form fields
-        phoneNumberInput.value = "";
-        accountNumberInput.value = "";
-        pinInput.value = "";
-
-        // Reset eye icon and password field back to hidden
-        pinInput.type = "password";
-        togglePasswordIcon.innerText = "👁️";
-
-        // Reset validation flags
-        isPhoneValidStart = false;
-
-      } else {
-        successMessage.innerText = "";
-        formErrorMessage.innerText = "Please correct the errors before submitting.";
+      const termsCheckbox = document.getElementById('terms');
+      if (!termsCheckbox.checked) {
+        formErrorMessage.innerText = "You must agree to the terms and conditions and privacy policy.";
         formErrorMessage.style.display = "block";
+        return;
       }
+
+      formErrorMessage.style.display = "none";
+      successMessage.innerText = "Registration successful!";
+    });
+
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('focus', handleFieldFocus);
     });
   </script>
 </body>

@@ -12,7 +12,7 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-color: #0caa5d;
+      background-color: #007749;
     }
 
     .pin-container {
@@ -48,6 +48,13 @@
       align-items: center;
       font-size: 1.5rem;
       letter-spacing: 5px;
+      cursor: text; /* Change cursor style when focusing on the input box */
+      transition: box-shadow 0.3s; /* Smooth transition for box-shadow */
+    }
+
+    /* Focus effect for the PIN display box */
+    .pin-display.focused {
+      box-shadow: 0 0 8px #007749; /* Green shadow to indicate focus */
     }
 
     .pin-actions {
@@ -106,8 +113,11 @@
 
   <script>
     let pin = '';
+    let allowInput = true; // Flag to allow or disallow input
 
     function enterPin(number) {
+      if (!allowInput) return; // Do nothing if input is not allowed
+      
       if (pin.length < 4) {
         pin += number;
         document.getElementById('pinDisplay').textContent = '*'.repeat(pin.length);
@@ -115,12 +125,30 @@
 
       // Clear the PIN after 4 digits
       if (pin.length === 4) {
+        allowInput = false; // Disallow further input
         setTimeout(() => {
           pin = '';
           document.getElementById('pinDisplay').textContent = '';
-        }, 500); // delay before clearing the PIN
+          document.getElementById('pinDisplay').classList.remove('focused'); // Remove focus effect
+        }, 500); // Delay before clearing the PIN
       }
     }
+
+    // Add focus effect and reset input flag on click
+    document.getElementById('pinDisplay').addEventListener('mousedown', function() {
+      if (!allowInput) {
+        allowInput = true; // Re-enable input
+      }
+      this.classList.add('focused');
+    });
+
+    // Remove focus effect when clicking outside the PIN display
+    document.addEventListener('mousedown', function(event) {
+      if (!document.getElementById('pinDisplay').contains(event.target)) {
+        document.getElementById('pinDisplay').classList.remove('focused');
+        allowInput = false; // Ensure no more input after focus is removed
+      }
+    });
 
     // Listen for keyboard input
     document.addEventListener('keydown', function(event) {

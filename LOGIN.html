@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #089f63;
+      background-color: #007749;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -47,10 +47,17 @@
       border-radius: 25px;
       cursor: pointer;
       width: 100%;
+      margin-top: 2%;
+      transition: background-color 0.3s ease; /* Smooth transition for background color */
     }
 
     .login-btn:hover {
       background-color: #ddd;
+    }
+
+    .login-btn.submitting {
+      background-color: #b0b0b0; /* Change to a different color to indicate submission */
+      cursor: not-allowed; /* Change cursor to indicate it's disabled */
     }
 
     .error {
@@ -73,7 +80,7 @@
 
     .register-link a {
       text-decoration: none;
-      color: #666;
+      color: #007749;
       font-weight: bold;
     }
 
@@ -108,10 +115,10 @@
     const phoneErrorMessage = document.getElementById('phoneErrorMessage');
     const accountErrorMessage = document.getElementById('accountErrorMessage');
     const formErrorMessage = document.getElementById('formErrorMessage');
+    const loginButton = document.querySelector('.login-btn');
 
     let isPhoneValidStart = false;
 
-    // Ensure only numbers are entered and phone number starts with 0 followed by 6 or 7
     function validatePhoneNumber(event) {
       let phoneNumber = phoneNumberInput.value;
 
@@ -145,17 +152,16 @@
       else if (isPhoneValidStart) {
         phoneNumberInput.value = phoneNumber;
 
-        // Remove error message and blur the input when the phone number reaches 10 digits
+        // Remove error message and move focus to account number input when phone number reaches 10 digits
         if (phoneNumber.length === 10) {
           phoneErrorMessage.style.display = "none";
-          phoneNumberInput.blur();  // Removes the focus (cursor) from the input
+          accountNumberInput.focus();  // Move focus to account number input
         }
       } else {
         phoneNumberInput.value = ""; // Clear if the first two digits are invalid
       }
     }
 
-    // Validate phone number on blur
     function validatePhoneOnBlur() {
       const phoneNumber = phoneNumberInput.value;
 
@@ -169,19 +175,17 @@
       }
     }
 
-    // Ensure only numbers are entered for account number
     function validateAccountNumber(event) {
       const accountNumber = accountNumberInput.value;
       accountNumberInput.value = accountNumber.replace(/\D/g, ''); // Restrict to numbers only
 
-      // Remove error message and blur the input when the account number reaches 13 digits
+      // Remove error message and move focus to submit button when account number reaches 13 digits
       if (accountNumber.length === 13) {
         accountErrorMessage.style.display = "none";
-        accountNumberInput.blur();  // Removes the focus (cursor) from the input
+        document.querySelector('.login-btn').focus(); // Move focus to submit button
       }
     }
 
-    // Validate account number on blur
     function validateAccountOnBlur() {
       const accountNumber = accountNumberInput.value;
 
@@ -204,13 +208,17 @@
 
       if (isPhoneValidStart && isPhoneNumberValid && isAccountNumberValid) {
         formErrorMessage.innerText = "";
+        loginButton.classList.add('submitting'); // Add class to indicate submission
 
         // Clear the form fields
         phoneNumberInput.value = "";
         accountNumberInput.value = "";
 
-        // Success - Proceed with form submission or redirection
-        alert("Form submitted successfully!");
+        // Simulate form submission or redirect here
+        setTimeout(() => {
+          loginButton.classList.remove('submitting'); // Remove class after some delay (simulate async task)
+          // alert("Form submitted successfully!"); // Optional: alert for success
+        }, 1000); // Adjust delay as needed
       } else {
         formErrorMessage.innerText = "Please correct the errors before submitting.";
         formErrorMessage.style.display = "block";
