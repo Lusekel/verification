@@ -19,7 +19,7 @@
             background-color: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0);
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
             text-align: center;
             max-width: 300px;
             width: 100%;
@@ -44,6 +44,7 @@
             text-align: center;
             border: 1px solid #ccc;
             border-radius: 5px;
+            type: 'number';
         }
 
         .otp-inputs input:focus {
@@ -67,44 +68,68 @@
             outline: none;
             box-shadow: 0 0 5px #007749;
         }
+
+        .error-message {
+            color: red;
+            display: none;
+            margin-top: 10px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="otp-container">
-        <h2>ENTER OTP</h2>
+        <h2>OTP sent to <span id="contactInfoDisplay"></span></h2>
         <div class="otp-inputs">
-            <input type="text" maxlength="1" oninput="moveToNext(this, 'otp2')" id="otp1">
-            <input type="text" maxlength="1" oninput="moveToNext(this, 'otp3')" id="otp2">
-            <input type="text" maxlength="1" oninput="moveToNext(this, 'otp4')" id="otp3">
-            <input type="text" maxlength="1" oninput="moveToNext(this, 'otp5')" id="otp4">
-            <input type="text" maxlength="1" oninput="moveToNext(this, 'otp6')" id="otp5">
-            <input type="text" maxlength="1" id="otp6" oninput="submitOTP()">
+            <input type="text" maxlength="1" id="otp1" oninput="focusNext('otp1', 'otp2')">
+            <input type="text" maxlength="1" id="otp2" oninput="focusNext('otp2', 'otp3')">
+            <input type="text" maxlength="1" id="otp3" oninput="focusNext('otp3', 'otp4')">
+            <input type="text" maxlength="1" id="otp4" oninput="focusNext('otp4', 'otp5')">
+            <input type="text" maxlength="1" id="otp5" oninput="focusNext('otp5', 'otp6')">
+            <input type="text" maxlength="1" id="otp6" oninput="focusNext('otp6', null)">
         </div>
         <button class="resend-btn" onclick="resendOTP()">Resend OTP</button>
+        <div id="errorMessage" class="error-message">Incorrect OTP. Please try again.</div>
     </div>
 
     <script>
-        function moveToNext(current, nextFieldID) {
-            if (current.value.length === 1) {
-                document.getElementById(nextFieldID).focus();
+        // Extract contact info from URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const contactInfo = urlParams.get('contact');
+        const contactInfoDisplay = document.getElementById('contactInfoDisplay');
+        contactInfoDisplay.textContent = contactInfo;
+
+        // Function to handle OTP input focus
+        function focusNext(currentId, nextId) {
+            const currentInput = document.getElementById(currentId);
+            if (currentInput.value.length === 1 && nextId) {
+                document.getElementById(nextId).focus();
+            }
+
+            // Validate OTP after entering the last digit
+            if (!nextId) {
+                validateOTP();
             }
         }
 
-        function submitOTP() {
-            const otp6 = document.getElementById('otp6');
-            if (otp6.value.length === 1) {
-                // Clear all the OTP input boxes and remove focus
-                document.querySelectorAll('.otp-inputs input').forEach(input => {
-                    input.value = ''; // Clear the value
-                    input.style.borderColor = '#ccc'; // Reset border color
-                    input.style.boxShadow = 'none'; // Remove focus shadow
-                });
-                otp6.blur(); // Remove focus from the last input box
+        // Function to validate OTP (example logic, replace with real validation)
+        function validateOTP() {
+            const otp = [...Array(6)].map((_, i) => document.getElementById(`otp${i + 1}`).value).join('');
+            if (otp === '123456') { // Example correct OTP
+                window.location.href = 'home.html';
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('errorMessage').style.display = 'none';
+                    [...Array(6)].forEach((_, i) => document.getElementById(`otp${i + 1}`).value = '');
+                    document.getElementById('otp1').focus();
+                }, 2000);
             }
         }
 
+        // Function to resend OTP (example logic, replace with real OTP sending)
         function resendOTP() {
-            alert("OTP has been resent!");
+            alert('OTP resent to ' + contactInfo);
         }
     </script>
 </body>

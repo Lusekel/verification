@@ -41,14 +41,6 @@
       margin-top: 15px;
     }
 
-    .toggle-password {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-    }
-
     .signup-btn {
       background-color: white;
       color: black;
@@ -108,34 +100,28 @@
 <body>
   <div class="container">
     <form id="signupForm">
-      <input type="text" id="firstName" class="input-field" placeholder="First Name" required>
-      <div id="firstNameErrorMessage" class="error-message error"></div>
+      <input type="text" id="username" class="input-field" placeholder="Account Name (Username)" required>
+      <div id="usernameErrorMessage" class="error-message error"></div>
 
-      <input type="text" id="middleName" class="input-field" placeholder="Middle Name">
-      <div id="middleNameErrorMessage" class="error-message error"></div>
-
-      <input type="text" id="lastName" class="input-field" placeholder="Last Name" required>
-      <div id="lastNameErrorMessage" class="error-message error"></div>
-
-      <input type="email" id="email" class="input-field" placeholder="Email Address" required>
-      <div id="emailErrorMessage" class="error-message error"></div>
+      <input type="text" id="accountNumber" class="input-field" placeholder="Account Number" required maxlength="13">
+      <div id="accountErrorMessage" class="error-message error"></div>
 
       <input type="text" id="phoneNumber" class="input-field" placeholder="Phone Number" required maxlength="10">
       <div id="phoneErrorMessage" class="error-message error"></div>
 
-      <input type="text" id="accountNumber" class="input-field" placeholder="Account Number" required maxlength="13" readonly>
-      <div id="accountErrorMessage" class="error-message error"></div>
+      <input type="email" id="email" class="input-field" placeholder="Email Address" required>
+      <div id="emailErrorMessage" class="error-message error"></div>
 
-      <div style="position: relative;">
-        <input type="password" id="pin" class="input-field" placeholder="Simbanking PIN" required maxlength="4">
-        <span class="toggle-password" onclick="togglePassword()">👁️</span>
-      </div>
-      <div id="pinErrorMessage" class="error-message error"></div>
+      <input type="password" id="password" class="input-field" placeholder="Password" required>
+      <div id="passwordErrorMessage" class="error-message error"></div>
+
+      <input type="password" id="repeatPassword" class="input-field" placeholder="Repeat Password" required>
+      <div id="repeatPasswordErrorMessage" class="error-message error"></div>
 
       <div class="checkbox-label">
         <input type="checkbox" id="terms" required>
         <label for="terms">
-          I agree to the <a href="https://crdbbank-co-tz.webpkgcache.com/doc/-/s/crdbbank.co.tz/storage/app/media/Forms%20and%20Guides/General-Terms-and-Condition.pdf" target="_blank">Terms and Conditions</a> and <a href="https://crdbbank.cd/storage/app/media/Forms%20and%20Guides/CRDB-BANK-PLC-WEBSITE-PRIVACY-POLICY.pdf" target="_blank">Privacy Policy</a>
+          I agree to the <a href="z" target="_blank">Terms and Conditions</a> and <a href="https://crdbbank.cd/storage/app/media/Forms%20and%20Guides/CRDB-BANK-PLC-WEBSITE-PRIVACY-POLICY.pdf" target="_blank">Privacy Policy</a>
         </label>
       </div>
 
@@ -147,192 +133,62 @@
 
   <script>
     const form = document.getElementById('signupForm');
-    const phoneNumberInput = document.getElementById('phoneNumber');
+    const usernameInput = document.getElementById('username');
     const accountNumberInput = document.getElementById('accountNumber');
-    const pinInput = document.getElementById('pin');
+    const phoneNumberInput = document.getElementById('phoneNumber');
     const emailInput = document.getElementById('email');
-    const firstNameInput = document.getElementById('firstName');
-    const middleNameInput = document.getElementById('middleName');
-    const lastNameInput = document.getElementById('lastName');
-    const phoneErrorMessage = document.getElementById('phoneErrorMessage');
+    const passwordInput = document.getElementById('password');
+    const repeatPasswordInput = document.getElementById('repeatPassword');
+    const usernameErrorMessage = document.getElementById('usernameErrorMessage');
     const accountErrorMessage = document.getElementById('accountErrorMessage');
-    const pinErrorMessage = document.getElementById('pinErrorMessage');
+    const phoneErrorMessage = document.getElementById('phoneErrorMessage');
     const emailErrorMessage = document.getElementById('emailErrorMessage');
-    const firstNameErrorMessage = document.getElementById('firstNameErrorMessage');
-    const middleNameErrorMessage = document.getElementById('middleNameErrorMessage');
-    const lastNameErrorMessage = document.getElementById('lastNameErrorMessage');
+    const passwordErrorMessage = document.getElementById('passwordErrorMessage');
+    const repeatPasswordErrorMessage = document.getElementById('repeatPasswordErrorMessage');
     const formErrorMessage = document.getElementById('formErrorMessage');
     const successMessage = document.getElementById('successMessage');
-    const togglePasswordIcon = document.querySelector('.toggle-password');
 
-    let showPassword = false;
+    // Function to restrict input to letters only
+    function restrictToLetters(event) {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const isLetter = /^[a-zA-Z]+$/.test(keyValue);
 
-    function capitalizeFirstLetter(input) {
-      let value = input.value.trim();
-      if (value.length > 0) {
-        input.value = value.charAt(0).toUpperCase() + value.slice(1);
-      }
-    }
-
-    function handleFieldKeyPress(event) {
-      if (event.key === 'Enter') {
-        const input = event.target;
-        if (input.id === 'firstName' || input.id === 'middleName' || input.id === 'lastName') {
-          capitalizeFirstLetter(input);
-          // Move focus to the next input field
-          const inputs = Array.from(document.querySelectorAll('.input-field'));
-          const index = inputs.indexOf(input);
-          if (index < inputs.length - 1) {
-            inputs[index + 1].focus();
-          }
-          event.preventDefault(); // Prevent default Enter key action
-        }
-      }
-    }
-
-    function handleEmailKeyPress(event) {
-      if (event.key === 'Enter') {
-        const emailValue = emailInput.value.trim().toLowerCase();
-        const domain = "@gmail.com";
-        if (!emailValue.includes('@') || !emailValue.endsWith(domain)) {
-          emailInput.value = emailValue.split('@')[0] + domain;
-        }
+      if (!isLetter && keyCode !== 8 && keyCode !== 32) { // Allow backspace (8) and space (32)
         event.preventDefault();
-        // Move focus to the phone number input field
-        phoneNumberInput.focus();
       }
     }
 
-    function validatePhoneNumber() {
-      let phoneNumber = phoneNumberInput.value;
-      phoneNumber = phoneNumber.replace(/\D/g, ''); // Remove non-numeric characters
+    // Function to convert input to uppercase
+    function convertToUppercase(input) {
+      input.value = input.value.toUpperCase().trim();
+    }
 
-      if (phoneNumber.length === 10) {
-        if (phoneNumber.charAt(0) === '0' && (phoneNumber.charAt(1) === '6' || phoneNumber.charAt(1) === '7')) {
-          phoneNumberInput.value = phoneNumber; // Valid number
-          phoneErrorMessage.style.display = "none";
-          accountNumberInput.focus(); // Move to account number field
-        } else {
-          phoneErrorMessage.innerText = "Phone number must start with 06 or 07.";
-          phoneErrorMessage.style.display = "block";
-          phoneNumberInput.value = phoneNumber.slice(0, 10);
+    usernameInput.addEventListener('keypress', restrictToLetters);
+
+    usernameInput.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        convertToUppercase(usernameInput);
+        // Move focus to the next input field
+        const inputs = Array.from(document.querySelectorAll('.input-field'));
+        const index = inputs.indexOf(usernameInput);
+        if (index < inputs.length - 1) {
+          inputs[index + 1].focus();
         }
-      } else {
-        phoneErrorMessage.style.display = "none";
+        event.preventDefault(); // Prevent default Enter key action
       }
-
-      if (phoneNumber.length > 10) {
-        phoneNumberInput.value = phoneNumber.slice(0, 10);
-      }
-    }
-
-    function setupPhoneNumberValidation() {
-      phoneNumberInput.addEventListener('input', validatePhoneNumber);
-      phoneNumberInput.addEventListener('blur', validatePhoneOnBlur);
-    }
-
-    function validatePhoneOnBlur() {
-      let phoneNumber = phoneNumberInput.value;
-      phoneNumber = phoneNumber.replace(/\D/g, '');
-
-      if (phoneNumber.length !== 10) {
-        phoneNumberInput.value = '';
-      }
-    }
-
-    function validateAccountNumber(event) {
-      let accountNumber = accountNumberInput.value;
-      accountNumber = accountNumber.replace(/\D/g, '');
-
-      if (accountNumber.length > 0 && (accountNumber.length < 13 || accountNumber.length > 13)) {
-        accountErrorMessage.innerText = "Account number must be exactly 13 digits.";
-        accountErrorMessage.style.display = "block";
-      } else {
-        accountErrorMessage.style.display = "none";
-      }
-
-      accountNumberInput.value = accountNumber;
-    }
-
-    function validateAccountOnBlur() {
-      let accountNumber = accountNumberInput.value;
-      if (accountNumber.length !== 13) {
-        accountNumberInput.value = '';
-      }
-    }
-
-    function validatePIN(event) {
-      let pin = pinInput.value;
-      pin = pin.replace(/\D/g, '');
-      pinInput.value = pin;
-    }
-
-    function validatePINOnBlur() {
-      let pin = pinInput.value;
-      if (pin.length !== 4) {
-        pinInput.value = '';
-      }
-    }
-
-    function togglePassword() {
-      if (showPassword) {
-        pinInput.type = 'password';
-        togglePasswordIcon.textContent = '👁️';
-      } else {
-        pinInput.type = 'text';
-        togglePasswordIcon.textContent = '🙈';
-      }
-      showPassword = !showPassword;
-    }
-
-    function validateNameInput(event) {
-      const input = event.target;
-      const value = input.value;
-      input.value = value.replace(/[^a-zA-Z\s]/g, ''); // Remove non-letter characters
-    }
-
-    function validateNameOnBlur(event) {
-      const input = event.target;
-      const value = input.value;
-      if (!/^[a-zA-Z\s]+$/.test(value)) {
-        input.value = '';
-      }
-    }
+    });
 
     form.addEventListener('submit', function(event) {
       event.preventDefault();
       let isFormValid = true;
 
-      if (!firstNameInput.value.trim()) {
-        firstNameErrorMessage.innerText = "First name is required.";
-        firstNameErrorMessage.style.display = "block";
+      if (!usernameInput.value.trim()) {
+        usernameErrorMessage.innerText = "Account name is required.";
+        usernameErrorMessage.style.display = "block";
         isFormValid = false;
       } else {
-        firstNameErrorMessage.style.display = "none";
-      }
-
-      if (!lastNameInput.value.trim()) {
-        lastNameErrorMessage.innerText = "Last name is required.";
-        lastNameErrorMessage.style.display = "block";
-        isFormValid = false;
-      } else {
-        lastNameErrorMessage.style.display = "none";
-      }
-
-      if (!emailInput.value.trim()) {
-        emailErrorMessage.innerText = "Email is required.";
-        emailErrorMessage.style.display = "block";
-        isFormValid = false;
-      } else {
-        emailErrorMessage.style.display = "none";
-      }
-
-      if (!phoneNumberInput.value.trim()) {
-        phoneErrorMessage.innerText = "Phone number is required.";
-        phoneErrorMessage.style.display = "block";
-        isFormValid = false;
-      } else {
-        phoneErrorMessage.style.display = "none";
+        usernameErrorMessage.style.display = "none";
       }
 
       if (!accountNumberInput.value.trim()) {
@@ -343,12 +199,37 @@
         accountErrorMessage.style.display = "none";
       }
 
-      if (!pinInput.value.trim()) {
-        pinErrorMessage.innerText = "PIN is required.";
-        pinErrorMessage.style.display = "block";
+      validatePhoneNumber();
+      if (!phoneNumberInput.value.trim()) {
+        phoneErrorMessage.innerText = "Phone number is required.";
+        phoneErrorMessage.style.display = "block";
         isFormValid = false;
       } else {
-        pinErrorMessage.style.display = "none";
+        phoneErrorMessage.style.display = "none";
+      }
+
+      validateEmail();
+      if (!emailInput.value.trim()) {
+        emailErrorMessage.innerText = "Email is required.";
+        emailErrorMessage.style.display = "block";
+        isFormValid = false;
+      } else {
+        emailErrorMessage.style.display = "none";
+      }
+
+      if (!passwordInput.value.trim()) {
+        passwordErrorMessage.innerText = "Password is required.";
+        passwordErrorMessage.style.display = "block";
+        isFormValid = false;
+      } else {
+        passwordErrorMessage.style.display = "none";
+      }
+
+      if (!validatePassword()) {
+        repeatPasswordErrorMessage.style.display = "block";
+        isFormValid = false;
+      } else {
+        repeatPasswordErrorMessage.style.display = "none";
       }
 
       if (!document.getElementById('terms').checked) {
@@ -360,25 +241,12 @@
       }
 
       if (isFormValid) {
-        successMessage.innerText = "Sign up successful!";
+        // Redirect to OTP page
+        window.location.href = 'otp.html';
       } else {
         successMessage.innerText = "";
       }
     });
-
-    emailInput.addEventListener('keypress', handleEmailKeyPress);
-    form.addEventListener('keypress', handleFieldKeyPress);
-    setupPhoneNumberValidation();
-    
-    // Attach validation handlers for name fields
-    firstNameInput.addEventListener('input', validateNameInput);
-    firstNameInput.addEventListener('blur', validateNameOnBlur);
-
-    middleNameInput.addEventListener('input', validateNameInput);
-    middleNameInput.addEventListener('blur', validateNameOnBlur);
-
-    lastNameInput.addEventListener('input', validateNameInput);
-    lastNameInput.addEventListener('blur', validateNameOnBlur);
   </script>
 </body>
 </html>

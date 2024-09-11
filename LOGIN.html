@@ -48,7 +48,7 @@
       cursor: pointer;
       width: 100%;
       margin-top: 2%;
-      transition: background-color 0.3s ease; /* Smooth transition for background color */
+      transition: background-color 0.3s ease;
     }
 
     .login-btn:hover {
@@ -56,8 +56,8 @@
     }
 
     .login-btn.submitting {
-      background-color: #b0b0b0; /* Change to a different color to indicate submission */
-      cursor: not-allowed; /* Change cursor to indicate it's disabled */
+      background-color: #b0b0b0;
+      cursor: not-allowed;
     }
 
     .error {
@@ -92,12 +92,15 @@
 <body>
   <div class="container">
     <form id="loginForm">
-      <!-- Phone number input first -->
-      <input type="text" id="phoneNumber" class="input-field" placeholder="Enter Phone Number" required maxlength="10" oninput="validatePhoneNumber(event)" onblur="validatePhoneOnBlur()">
-      <div id="phoneErrorMessage" class="error-message error"></div>
+      <input type="radio" id="phoneOption" name="contactOption" value="phone" checked>
+      <label for="phoneOption">Phone Number</label>
+      <input type="radio" id="emailOption" name="contactOption" value="email">
+      <label for="emailOption">Email</label>
 
-      <!-- Account number input second -->
-      <input type="text" id="accountNumber" class="input-field" placeholder="Enter Account Number" required maxlength="13" oninput="validateAccountNumber(event)" onblur="validateAccountOnBlur()">
+      <input type="text" id="contactInfo" class="input-field" placeholder="Enter Phone Number or Email" required oninput="validateContactInfo(event)">
+      <div id="contactErrorMessage" class="error-message error"></div>
+
+      <input type="text" id="accountNumber" class="input-field" placeholder="Enter Account Number" required maxlength="13" oninput="validateAccountNumber(event)">
       <div id="accountErrorMessage" class="error-message error"></div>
 
       <button type="submit" class="login-btn">Log In</button>
@@ -110,115 +113,60 @@
 
   <script>
     const form = document.getElementById('loginForm');
-    const phoneNumberInput = document.getElementById('phoneNumber');
+    const contactInfoInput = document.getElementById('contactInfo');
     const accountNumberInput = document.getElementById('accountNumber');
-    const phoneErrorMessage = document.getElementById('phoneErrorMessage');
+    const contactErrorMessage = document.getElementById('contactErrorMessage');
     const accountErrorMessage = document.getElementById('accountErrorMessage');
     const formErrorMessage = document.getElementById('formErrorMessage');
     const loginButton = document.querySelector('.login-btn');
+    const phoneOption = document.getElementById('phoneOption');
+    const emailOption = document.getElementById('emailOption');
 
-    let isPhoneValidStart = false;
-
-    function validatePhoneNumber(event) {
-      let phoneNumber = phoneNumberInput.value;
-
-      // Allow only numeric input
-      phoneNumber = phoneNumber.replace(/\D/g, '');
-
-      // Check first digit
-      if (phoneNumber.length === 1) {
-        if (phoneNumber.charAt(0) !== '0') {
-          phoneErrorMessage.innerText = "Phone number must start with 0.";
-          phoneErrorMessage.style.display = "block";
-          phoneNumberInput.value = ""; // Clear input if not starting with 0
-          isPhoneValidStart = false;
+    function validateContactInfo(event) {
+      const contactInfo = contactInfoInput.value;
+      if (phoneOption.checked) {
+        contactInfoInput.value = contactInfo.replace(/\D/g, ''); // Only allow numbers
+        if (contactInfo.length > 10) contactInfoInput.value = contactInfo.slice(0, 10);
+        if (contactInfo.length === 10 && contactInfo[0] !== '0') {
+          contactErrorMessage.innerText = "Phone number must start with 0.";
+          contactErrorMessage.style.display = "block";
+        } else if (contactInfo.length < 10 && contactInfo.length > 0) {
+          contactErrorMessage.innerText = "Phone number must be exactly 10 digits.";
+          contactErrorMessage.style.display = "block";
         } else {
-          phoneErrorMessage.style.display = "none";
+          contactErrorMessage.style.display = "none";
         }
-      }
-      // Check second digit
-      else if (phoneNumber.length === 2) {
-        if (phoneNumber.charAt(1) !== '6' && phoneNumber.charAt(1) !== '7') {
-          phoneErrorMessage.innerText = "Second digit must be 6 or 7.";
-          phoneErrorMessage.style.display = "block";
-          phoneNumberInput.value = "0"; // Reset input to only the first valid digit
-          isPhoneValidStart = false;
+      } else if (emailOption.checked) {
+        if (!contactInfo.endsWith("@gmail.com")) {
+          contactErrorMessage.innerText = "Email must end with @gmail.com.";
+          contactErrorMessage.style.display = "block";
         } else {
-          phoneErrorMessage.style.display = "none";
-          isPhoneValidStart = true;
+          contactErrorMessage.style.display = "none";
         }
-      }
-      // Allow further input only if the first two digits are valid
-      else if (isPhoneValidStart) {
-        phoneNumberInput.value = phoneNumber;
-
-        // Remove error message and move focus to account number input when phone number reaches 10 digits
-        if (phoneNumber.length === 10) {
-          phoneErrorMessage.style.display = "none";
-          accountNumberInput.focus();  // Move focus to account number input
-        }
-      } else {
-        phoneNumberInput.value = ""; // Clear if the first two digits are invalid
-      }
-    }
-
-    function validatePhoneOnBlur() {
-      const phoneNumber = phoneNumberInput.value;
-
-      // If the phone number is not exactly 10 digits and the first two digits are valid
-      if (isPhoneValidStart && phoneNumber.length !== 10) {
-        phoneErrorMessage.innerText = "Phone number must be exactly 10 digits.";
-        phoneErrorMessage.style.display = "block";
-        phoneNumberInput.focus();
-      } else {
-        phoneErrorMessage.style.display = "none";
       }
     }
 
     function validateAccountNumber(event) {
       const accountNumber = accountNumberInput.value;
       accountNumberInput.value = accountNumber.replace(/\D/g, ''); // Restrict to numbers only
-
-      // Remove error message and move focus to submit button when account number reaches 13 digits
       if (accountNumber.length === 13) {
         accountErrorMessage.style.display = "none";
         document.querySelector('.login-btn').focus(); // Move focus to submit button
-      }
-    }
-
-    function validateAccountOnBlur() {
-      const accountNumber = accountNumberInput.value;
-
-      // If account number is not exactly 13 digits, show error and refocus
-      if (accountNumber.length !== 13) {
+      } else if (accountNumber.length < 13) {
         accountErrorMessage.innerText = "Account number must be exactly 13 digits.";
         accountErrorMessage.style.display = "block";
-        accountNumberInput.focus();
       } else {
         accountErrorMessage.style.display = "none";
       }
     }
 
-    // Form Submission Validation
     form.addEventListener('submit', function(event) {
       event.preventDefault();
-
-      const isPhoneNumberValid = phoneNumberInput.value.length === 10;
-      const isAccountNumberValid = accountNumberInput.value.length === 13;
-
-      if (isPhoneValidStart && isPhoneNumberValid && isAccountNumberValid) {
-        formErrorMessage.innerText = "";
-        loginButton.classList.add('submitting'); // Add class to indicate submission
-
-        // Clear the form fields
-        phoneNumberInput.value = "";
-        accountNumberInput.value = "";
-
-        // Simulate form submission or redirect here
+      if (contactErrorMessage.style.display === "none" && accountErrorMessage.style.display === "none") {
+        loginButton.classList.add('submitting');
         setTimeout(() => {
-          loginButton.classList.remove('submitting'); // Remove class after some delay (simulate async task)
-          // alert("Form submitted successfully!"); // Optional: alert for success
-        }, 1000); // Adjust delay as needed
+          window.location.href = "otp.html"; // Redirect to OTP page
+        }, 1000); // Simulate delay for form submission
       } else {
         formErrorMessage.innerText = "Please correct the errors before submitting.";
         formErrorMessage.style.display = "block";
